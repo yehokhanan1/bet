@@ -21,23 +21,12 @@ def value_of_hand(hand):
     return val
 
 count = 0  # Contagem de cartas inicial
-
-def update_count(card):
-    global count
-    if card in ['2', '3', '4', '5', '6']:
-        count += 1
-    elif card in ['10', 'J', 'Q', 'K', 'A']:
-        count -= 1
-
 played_cards = {}
 
 def blackjack_decision(player_hand, dealer_card):
     global count, played_cards
-
-    # Registra as cartas jogadas
-    for card in player_hand:
-        played_cards[card] = played_cards.get(card, 0) + 1
-    played_cards[dealer_card] = played_cards.get(dealer_card, 0) + 1
+    print(count)
+    print(played_cards)
 
     def is_soft_hand(hand):
         return 'A' in hand and sum([card_value(card) for card in hand]) + 10 <= 21
@@ -62,12 +51,13 @@ def blackjack_decision(player_hand, dealer_card):
     count += card_count_values.get(dealer_card, 0)
     for card in player_hand:
         count += card_count_values.get(card, 0)
-    
+    print(count)
     # Estimar o número de baralhos restantes
     total_cards_played = len(played_cards)
     decks_remaining = max(1, (8 * 52 - total_cards_played) / 52)
     true_count = count / decks_remaining
-
+    print(true_count)
+    print(decks_remaining)
     value = value_of_hand(player_hand)
     soft = is_soft_hand(player_hand)
     cards_num = len(player_hand)
@@ -199,7 +189,14 @@ def main_gui():
             decision_vars[idx].set(f"D: {decision}")
 
     def finalize_round():
-        dealer_final_hand = simpledialog.askstring("Final do Dealer", "Insira as cartas finais do dealer (separadas por espaço):").split()
+        # Recuperando a carta "virada" do dealer
+        facedown_card = dealer_card_var.get().upper()
+
+        dealer_final_hand = simpledialog.askstring("Final do Dealer", "Insira as cartas finais do dealer (separadas por espaço):").upper().split()
+        
+        # Adicionando a carta "virada" do dealer à lista das cartas finais do dealer
+        dealer_final_hand.append(facedown_card)
+
         for card in dealer_final_hand:
             if card in deck:
                 deck.remove(card)
@@ -211,7 +208,7 @@ def main_gui():
             for card in hand:
                 if card in deck:
                     deck.remove(card)
-                played_cards[card] = played_cards.get(card, 0) + 1  # Modificado para atualizar o dicionário corretamente
+                played_cards[card] = played_cards.get(card, 0) + 1
             player_vars[idx].set('')
 
         # Clear dealer's card entry
